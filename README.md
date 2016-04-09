@@ -1,2 +1,3 @@
 # framework.js
-Building Angularjs from scratch.
+Building Angularjs like framework from scratch.
+

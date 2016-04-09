@@ -60,7 +60,7 @@ describe('Digest',function(){
 		scope.$digest();
 		expect(scope.counter).toBe(1);
 	});
-	
+
 	it("calls listener with new value as old value the first time", function() {
 	    scope.someValue = 123;
 	    var oldValueGiven;
@@ -70,6 +70,38 @@ describe('Digest',function(){
 	    );
 	    scope.$digest();
 	    expect(oldValueGiven).toBe(123);
+	});
+
+	it('May have watchers that ommits listener functions', function(){
+		var watcherFn = jasmine.createSpy().and.returnValue('something');
+		scope.$watch(watcherFn);
+		scope.$digest();
+
+		expect(watcherFn).toHaveBeenCalled();
+	});
+	it("triggers chained watchers in the same digest", function() {
+	    scope.name = 'Jane';
+	    scope.$watch(
+	    	function(scope) { return scope.nameUpper; },
+	        function(newValue, oldValue, scope) {
+	            if (newValue) {
+	                scope.initial = newValue.substring(0, 1) + '.';
+	            }
+	        }
+	    );
+	    scope.$watch(
+	        function(scope) { return scope.name; },
+	        function(newValue, oldValue, scope) {
+	            if (newValue) {
+	                scope.nameUpper = newValue.toUpperCase();
+	            }
+	        }
+	    );
+	    scope.$digest();
+	    expect(scope.initial).toBe('J.');
+	    scope.name = 'Bob';
+	    scope.$digest();
+	    expect(scope.initial).toBe('B.');
 	});
 
 });
